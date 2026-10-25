@@ -1,0 +1,1422 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AquaMind | Farm Dashboard</title>
+    <style>
+      .live-zones {
+        margin: 30px 20px;
+        padding: 20px;
+        border: 1px solid #1d5732;
+        border-radius: 14px;
+        background: #091b10;
+      }
+
+      .live-zones h2 {
+        margin-top: 0;
+        color: #49e894;
+      }
+
+      .dynamic-zones {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+      }
+
+      .zone-card {
+        padding: 16px;
+        border: 1px solid #285d39;
+        border-radius: 10px;
+        background: #06120b;
+      }
+
+      .zone-card h3 {
+        margin: 0 0 12px;
+        color: #ffffff;
+      }
+
+      .zone-card p {
+        margin: 7px 0;
+        color: #9cc9a8;
+      }
+
+      .zone-card strong {
+        color: #49e894;
+      }
+      .add-zone-button {
+        position: fixed;
+        top: 18px;
+        right: 22px;
+        z-index: 1000;
+        padding: 11px 16px;
+        border-radius: 8px;
+        color: #042012;
+        font-weight: bold;
+        text-decoration: none;
+        background: #49e894;
+      }
+      :root {
+        --bg: #06120b;
+        --panel: #091b10;
+        --line: #183825;
+        --green: #39e58d;
+        --text: #e8fff1;
+        --muted: #78a185;
+        --cyan: #1bd6e7;
+        --amber: #eeb736;
+        --red: #f05252;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 13px;
+      }
+      .app {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 195px 1fr;
+      }
+      .side {
+        min-height: 100vh;
+        border-right: 1px solid var(--line);
+        background: #07170d;
+        padding: 15px;
+      }
+      .brand {
+        padding: 0 0 16px;
+        border-bottom: 1px solid var(--line);
+        font-weight: bold;
+        font-size: 15px;
+        color: white;
+      }
+      .brand b {
+        color: var(--green);
+      }
+      .brand small {
+        display: block;
+        margin-left: 28px;
+        color: #69b77e;
+        font-size: 8px;
+        letter-spacing: 1.5px;
+      }
+      .mark {
+        display: inline-grid;
+        place-items: center;
+        width: 23px;
+        height: 23px;
+        margin-right: 7px;
+        border: 1px solid #217942;
+        border-radius: 7px;
+        color: var(--green);
+      }
+      nav {
+        margin-top: 12px;
+      }
+      nav a {
+        display: block;
+        padding: 10px 12px;
+        margin: 3px 0;
+        border-radius: 8px;
+        color: #83b494;
+        text-decoration: none;
+      }
+      nav a:hover,
+      nav a.active {
+        background: #113b20;
+        color: #56f19b;
+        font-weight: bold;
+      }
+      .status {
+        position: fixed;
+        bottom: 16px;
+        width: 163px;
+        border-top: 1px solid var(--line);
+        padding-top: 12px;
+        color: #78a185;
+        font-size: 10px;
+        line-height: 1.8;
+      }
+      .status b {
+        float: right;
+        color: #4de78c;
+        font-weight: normal;
+      }
+      .main {
+        padding: 0 17px 22px;
+        overflow: hidden;
+      }
+      .top {
+        height: 51px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+      }
+      h1 {
+        font-size: 15px;
+        margin: 0 0 3px;
+      }
+      .date {
+        color: #527660;
+        font-size: 9px;
+      }
+      .weather {
+        color: #bfdbc6;
+        font-size: 11px;
+        font-weight: bold;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin: 10px 0 12px;
+      }
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: var(--panel);
+        padding: 15px;
+        min-height: 82px;
+      }
+      .eyebrow {
+        color: #65b17d;
+        font-size: 8px;
+        letter-spacing: 1.4px;
+      }
+      .metric {
+        font-family: Georgia, serif;
+        font-size: 23px;
+        font-weight: bold;
+        margin: 8px 0 4px;
+      }
+      .hint {
+        color: #5e9f70;
+        font-size: 9px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(450px, 2.1fr) minmax(260px, 1fr);
+        gap: 10px;
+      }
+      .section-title {
+        display: flex;
+        justify-content: space-between;
+        margin: 0 0 9px;
+        color: #e9fff0;
+        font-weight: bold;
+      }
+      .section-title span {
+        color: #49d886;
+        font-size: 9px;
+      }
+      .zones {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .zone {
+        min-height: 100px;
+        padding: 13px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: var(--panel);
+      }
+      .zone-top {
+        display: flex;
+        justify-content: space-between;
+        font-weight: bold;
+      }
+      .zone small {
+        display: block;
+        color: #57936c;
+        margin-top: 4px;
+        font-size: 9px;
+      }
+      .pill {
+        font-size: 8px;
+        padding: 3px 5px;
+        border-radius: 3px;
+        background: #11572e;
+        color: #54e88c;
+      }
+      .pill.warn {
+        background: #4d3c04;
+        color: #ffc42d;
+      }
+      .pill.bad {
+        background: #571a1a;
+        color: #ff7777;
+      }
+      .zone-data {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 12px;
+      }
+      .ring {
+        width: 43px;
+        height: 43px;
+        border: 4px solid var(--green);
+        border-left-color: #173625;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: white;
+        font-size: 10px;
+        font-weight: bold;
+      }
+      .ring.warn {
+        border-color: var(--amber);
+        border-left-color: #173625;
+      }
+      .ring.red {
+        border-color: var(--red);
+        border-left-color: #173625;
+      }
+      .details {
+        flex: 1;
+        color: #59a875;
+        font-family: monospace;
+        font-size: 9px;
+        line-height: 1.6;
+      }
+      .details b {
+        float: right;
+        color: #e9fff0;
+      }
+      .recs {
+        display: grid;
+        gap: 8px;
+      }
+      .rec {
+        min-height: 74px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-left: 2px solid var(--green);
+        border-radius: 11px;
+        background: var(--panel);
+      }
+      .rec.warn {
+        border-color: #71560c;
+        border-left-color: var(--amber);
+      }
+      .rec.bad {
+        border-color: #6d2a2a;
+        border-left-color: var(--red);
+      }
+      .rec.cyan {
+        border-color: #12606a;
+        border-left-color: var(--cyan);
+      }
+      .rec h3 {
+        margin: 0 0 8px;
+        font-size: 11px;
+      }
+      .rec p {
+        margin: 0;
+        color: #63a378;
+        font-size: 9px;
+        line-height: 1.45;
+      }
+      .bar {
+        height: 2px;
+        margin-top: 10px;
+        background: #143727;
+      }
+      .bar i {
+        display: block;
+        height: 100%;
+        background: var(--green);
+      }
+      .bottom {
+        display: grid;
+        grid-template-columns: 1.75fr 1.15fr;
+        gap: 10px;
+        margin-top: 24px;
+      }
+      .chart,
+      .activity {
+        min-height: 205px;
+        padding: 15px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: var(--panel);
+      }
+      .chart h2,
+      .activity h2 {
+        margin: 0;
+        font-size: 12px;
+      }
+      .chart p {
+        margin: 4px 0;
+        color: #6da881;
+        font: 9px monospace;
+      }
+      .bars {
+        height: 117px;
+        display: flex;
+        align-items: end;
+        justify-content: space-around;
+        margin-top: 10px;
+        border-bottom: 1px solid #21432d;
+      }
+      .bar-item {
+        width: 25px;
+        text-align: center;
+        color: #71a981;
+        font-size: 8px;
+      }
+      .bar-item i {
+        display: block;
+        width: 13px;
+        margin: auto;
+        background: #83aa43;
+      }
+      .activity a {
+        float: right;
+        color: #42e68c;
+        text-decoration: none;
+        font-size: 9px;
+      }
+      .event {
+        margin-top: 13px;
+        padding-left: 12px;
+        border-left: 1px solid #245234;
+        color: #e8fff0;
+        font-size: 10px;
+      }
+      .event small {
+        display: block;
+        color: #5e9b70;
+        margin-top: 4px;
+      }
+      .event::first-letter {
+        color: #4fe591;
+      }
+      @media (max-width: 900px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+        .side {
+          min-height: 0;
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+        .status {
+          display: none;
+        }
+        nav {
+          display: flex;
+          overflow: auto;
+        }
+        nav a {
+          white-space: nowrap;
+        }
+        .layout,
+        .bottom {
+          grid-template-columns: 1fr;
+        }
+        .main {
+          padding: 0 12px 20px;
+        }
+      }
+      @media (max-width: 620px) {
+        .stats,
+        .zones {
+          grid-template-columns: 1fr 1fr;
+        }
+        .top {
+          height: auto;
+          padding: 12px 0;
+        }
+        .weather {
+          display: none;
+        }
+        .main {
+          overflow: visible;
+        }
+        .card {
+          padding: 12px;
+        }
+        .layout {
+          display: block;
+        }
+        .recs {
+          margin-top: 14px;
+        }
+      }
+      @media (max-width: 400px) {
+        .stats,
+        .zones {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <style>
+      #zoneMap {
+        width: 100%;
+        height: 520px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #183825;
+        margin-top: 20px;
+      }
+
+      .map-card {
+        background: #091b10;
+        border: 1px solid #183825;
+        border-radius: 14px;
+        padding: 20px;
+        margin-top: 20px;
+      }
+
+      .map-card h2 {
+        margin: 0;
+        color: #e8fff1;
+      }
+      .zone-marker {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+      }
+
+      .zone-marker.good {
+        background: #22c55e;
+      }
+
+      .zone-marker.low {
+        background: #f59e0b;
+      }
+
+      .zone-marker.critical {
+        background: #ef4444;
+      }
+
+      .zone-marker.default {
+        background: #3b82f6;
+      }
+      .schedule-grid {
+        display: grid;
+        gap: 16px;
+        margin-top: 25px;
+      }
+
+      .schedule-card {
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #091b10;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .schedule-info h2 {
+        margin: 0 0 8px;
+        color: white;
+      }
+
+      .schedule-info p {
+        margin: 5px 0;
+        color: #81ab8d;
+      }
+
+      .schedule-info b {
+        color: #49e894;
+      }
+
+      .schedule-status {
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: bold;
+      }
+
+      .schedule-status.scheduled {
+        color: #49e894;
+        background: rgba(73, 232, 148, 0.12);
+      }
+
+      .schedule-status.running {
+        color: #ffd45c;
+        background: rgba(255, 212, 92, 0.12);
+      }
+      #scheduleSection {
+        width: 100%;
+      }
+
+      #scheduleSection h1 {
+        color: #e8fff1;
+        font-size: 22px;
+        margin-bottom: 5px;
+      }
+
+      .schedule-grid {
+        display: grid;
+        gap: 14px;
+        margin-top: 20px;
+      }
+
+      .schedule-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #091b10;
+      }
+
+      .schedule-info h2 {
+        margin: 0 0 8px;
+        color: white;
+        font-size: 16px;
+      }
+
+      .schedule-info p {
+        margin: 5px 0;
+        color: #81ab8d;
+      }
+
+      .schedule-info b {
+        color: #49e894;
+      }
+
+      .schedule-status {
+        padding: 7px 13px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: bold;
+      }
+
+      .schedule-status.scheduled {
+        color: #49e894;
+        background: rgba(73, 232, 148, 0.12);
+      }
+
+      .schedule-status.running {
+        color: #ffd45c;
+        background: rgba(255, 212, 92, 0.12);
+      }
+      #scheduleSection {
+        display: block !important;
+        width: 100%;
+        min-height: 500px !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+
+      #scheduleSection > div {
+        min-height: 450px;
+        height: auto !important;
+        overflow: visible !important;
+      }
+
+      #scheduleSection .schedule-grid {
+        display: grid !important;
+        width: 100%;
+        min-height: 380px !important;
+        height: auto !important;
+        gap: 16px;
+        overflow: visible !important;
+      }
+
+      #scheduleSection .schedule-card {
+        min-height: 110px;
+        height: auto !important;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="add-zone.html" class="add-zone-button">+ Add Zone</a>
+
+    <div class="app">
+      <aside class="side">
+        <div class="brand">
+          <span class="mark">♧</span>Aqua<b>Mind</b><small>AI IRRIGATION</small>
+        </div>
+        <nav>
+          <a
+            class="active"
+            href="#"
+            onclick="
+              showSection('overviewSection');
+              return false;
+            "
+          >
+            ▦ &nbsp; Overview
+          </a>
+          <a
+            href="#"
+            onclick="
+              showSection('zoneMapSection');
+              return false;
+            "
+          >
+            <span>♧</span>
+            Zone Map
+          </a>
+          <a
+            href="#"
+            onclick="
+              showSection('scheduleSection');
+              return false;
+            "
+          >
+            ▣ &nbsp; Schedule
+          </a>
+          <a href="analytics.html">⌁ &nbsp; Analytics</a>
+          <a href="weather.html">☂ &nbsp; Weather</a>
+          <a href="index.html">⚙ &nbsp; Home</a>
+        </nav>
+        <div class="status">
+          SYSTEM<br />Sensors <b>12 / 12 online</b><br />AI Engine <b>Running</b
+          ><br />Network <b>Connected</b>
+        </div>
+      </aside>
+      <main class="main">
+        <header class="top">
+          <div>
+            <h1>Farm Overview</h1>
+            <span class="date" id="dashboardDate"
+              >Sunday, 16 Aug 2026 • 09:42 AM</span
+            >
+          </div>
+          <div class="weather">
+            🌡️ <span id="weatherTemp">--</span>°C &nbsp;&nbsp; 💧
+            <span id="weatherHumidity">--</span>% RH &nbsp;&nbsp; 💨
+            <span id="weatherWind">--</span> km/h &nbsp;&nbsp; ☀️
+            <span id="weatherCondition">Loading...</span>
+          </div>
+        </header>
+        <section class="stats">
+          <div class="card">
+            <span class="eyebrow">WATER SAVED TODAY</span>
+            <div class="metric" id="waterSaved">310 L</div>
+            <span class="hint">+12% VS AVG &nbsp; AI-optimised cycles</span>
+          </div>
+          <div class="card">
+            <span class="eyebrow">ACTIVE ZONES</span>
+            <div class="metric" id="activeZones">1 / 6</div>
+            <span class="hint">2 zones irrigating now</span>
+          </div>
+          <div class="card">
+            <span class="eyebrow">AVG SOIL MOISTURE</span>
+            <div class="metric" id="avgSoilMoisture">55.8%</div>
+            <span class="hint">+2.1% across all sensors</span>
+          </div>
+          <div class="card">
+            <span class="eyebrow">NEXT AI SCHEDULE</span>
+            <div class="metric" id="nextSchedule">5:30 AM</div>
+            <span class="hint">URGENT &nbsp; Zone 5 — critical</span>
+          </div>
+        </section>
+        <section class="layout">
+          <div>
+            <div class="section-title" id="zones">
+              Irrigation Zones <span>1 active • 6 total</span>
+            </div>
+            <div class="zones" id="zoneCards">Loading zones...</div>
+          </div>
+          <aside>
+            <div class="section-title">☁ AI Recommendations</div>
+            <div class="recs" id="recommendations">
+              <article class="rec">
+                <h3>🌱 Checking your farm...</h3>
+                <p>Loading real irrigation recommendations.</p>
+                <div class="bar">
+                  <i style="width: 50%"></i>
+                </div>
+              </article>
+            </div>
+          </aside>
+        </section>
+        <section class="bottom">
+          <!-- REAL WATER USAGE -->
+          <div class="chart" id="analytics">
+            <h2>Water Usage</h2>
+
+            <p>Current water usage by your irrigation zones • Litres</p>
+
+            <div class="bars" id="waterUsageBars">
+              <div style="padding: 20px">Loading water usage...</div>
+            </div>
+          </div>
+
+          <!-- REAL ACTIVITY -->
+          <div class="activity">
+            <h2>Recent Activity</h2>
+
+            <div id="recentActivity">
+              <div class="event">Loading activity...</div>
+            </div>
+          </div>
+        </section>
+        <div id="zoneMapSection" style="display: none">
+          <h1>Zone Map</h1>
+
+          <div class="map-card">
+            <h2>Farm Zone Locations</h2>
+
+            <div id="zoneMap"></div>
+          </div>
+        </div>
+        <!-- SCHEDULE SECTION -->
+        <section id="scheduleSection" style="display: none">
+          <div style="padding: 20px 0">
+            <h1 style="font-size: 22px; margin-bottom: 5px">
+              Irrigation Schedule
+            </h1>
+
+            <span class="date">Today's irrigation plan</span>
+
+            <!-- Real user zones will appear here -->
+            <div class="schedule-grid" id="scheduleGrid">
+              <p>Loading schedules...</p>
+            </div>
+          </div>
+        </section>
+      </main>
+      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    </div>
+    <script>
+      async function loadWeather() {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        try {
+          const response = await fetch("http://localhost:5000/api/weather", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            console.error(data.message);
+            return;
+          }
+
+          document.getElementById("weatherTemp").textContent = data.temperature;
+
+          document.getElementById("weatherHumidity").textContent =
+            data.humidity;
+
+          document.getElementById("weatherWind").textContent = data.windSpeed;
+
+          document.getElementById("weatherCondition").textContent =
+            data.condition;
+        } catch (error) {
+          console.error("Weather loading error:", error);
+        }
+      }
+      async function loadDashboard() {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        try {
+          const response = await fetch("http://localhost:5000/api/dashboard", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            console.error(data.message);
+            return;
+          }
+
+          // Date & Time
+          document.getElementById("dashboardDate").textContent =
+            `${data.date} • ${data.time}`;
+
+          // Water Saved
+          document.getElementById("waterSaved").textContent =
+            `${data.waterSaved} L`;
+
+          // Active Zones
+          document.getElementById("activeZones").textContent =
+            `${data.activeZones} / ${data.totalZones}`;
+
+          // Average Soil Moisture
+          document.getElementById("avgSoilMoisture").textContent =
+            `${data.averageSoilMoisture}%`;
+
+          // Next AI Schedule
+          document.getElementById("nextSchedule").textContent =
+            data.nextSchedule;
+        } catch (error) {
+          console.error("Dashboard loading error:", error);
+        }
+      }
+      async function loadRecommendations() {
+        const token = localStorage.getItem("token");
+        const container = document.getElementById("recommendations");
+
+        if (!token || !container) return;
+
+        try {
+          const response = await fetch("http://localhost:5000/api/zones", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          const zones = await response.json();
+
+          if (!response.ok) {
+            throw new Error(zones.message || "Unable to load zones");
+          }
+
+          if (!Array.isArray(zones) || zones.length === 0) {
+            container.innerHTML = `
+        <article class="rec">
+          <h3>🌱 No Zones Yet</h3>
+          <p>Add a zone from the Dashboard to get irrigation recommendations.</p>
+          <div class="bar">
+            <i style="width: 20%"></i>
+          </div>
+        </article>
+      `;
+            return;
+          }
+
+          const recommendations = [];
+
+          // Find the driest zone
+          const driestZone = [...zones].sort(
+            (a, b) => Number(a.soilMoisture || 0) - Number(b.soilMoisture || 0),
+          )[0];
+
+          const moisture = Number(driestZone.soilMoisture || 0);
+
+          // Critical moisture
+          if (moisture < 30) {
+            recommendations.push(`
+        <article class="rec bad">
+          <h3>⚠ ${driestZone.name} — Critical Moisture</h3>
+          <p>
+            Soil moisture is ${moisture}%.
+            Irrigation is recommended soon.
+          </p>
+          <div class="bar">
+            <i style="width: 97%; background: var(--red)"></i>
+          </div>
+        </article>
+      `);
+          }
+
+          // Low moisture
+          else if (moisture < 50) {
+            recommendations.push(`
+        <article class="rec warn">
+          <h3>⚠ ${driestZone.name} — Low Moisture</h3>
+          <p>
+            Soil moisture is ${moisture}%.
+            Consider scheduling irrigation.
+          </p>
+          <div class="bar">
+            <i style="width: 75%; background: var(--amber)"></i>
+          </div>
+        </article>
+      `);
+          }
+
+          // Good moisture
+          else {
+            recommendations.push(`
+        <article class="rec">
+          <h3>✓ ${driestZone.name} — Moisture Good</h3>
+          <p>
+            Soil moisture is ${moisture}%.
+            No immediate irrigation required.
+          </p>
+          <div class="bar">
+            <i style="width: 45%"></i>
+          </div>
+        </article>
+      `);
+          }
+
+          // Next watering recommendation
+          const scheduledZone = zones.find((zone) => zone.nextWater);
+
+          if (scheduledZone) {
+            recommendations.push(`
+        <article class="rec cyan">
+          <h3>💧 Next Irrigation — ${scheduledZone.name}</h3>
+          <p>
+            Next watering is scheduled at
+            ${scheduledZone.nextWater}.
+          </p>
+          <div class="bar">
+            <i style="width: 80%; background: var(--cyan)"></i>
+          </div>
+        </article>
+      `);
+          }
+
+          // Water saving information
+          const totalSaved = zones.reduce(
+            (sum, zone) => sum + Number(zone.waterSaved || 0),
+            0,
+          );
+
+          recommendations.push(`
+      <article class="rec">
+        <h3>💚 Water Saving</h3>
+        <p>
+          Total recorded water saving:
+          ${totalSaved} L.
+        </p>
+        <div class="bar">
+          <i style="width: 70%"></i>
+        </div>
+      </article>
+    `);
+
+          container.innerHTML = recommendations.join("");
+        } catch (error) {
+          console.error("Recommendation error:", error);
+
+          container.innerHTML = `
+      <article class="rec bad">
+        <h3>⚠ Unable to load recommendations</h3>
+        <p>${error.message}</p>
+      </article>
+    `;
+        }
+      }
+      // ================= SECTION NAVIGATION =================
+
+      function showSection(sectionId) {
+        const top = document.querySelector(".main > .top");
+        const stats = document.querySelector(".main > .stats");
+        const layout = document.querySelector(".main > .layout");
+        const bottom = document.querySelector(".main > .bottom");
+
+        const zoneMap = document.getElementById("zoneMapSection");
+        const schedule = document.getElementById("scheduleSection");
+
+        // Hide all sections first
+        zoneMap.style.display = "none";
+        schedule.style.display = "none";
+
+        if (sectionId === "zoneMapSection") {
+          top.style.display = "none";
+          stats.style.display = "none";
+          layout.style.display = "none";
+          bottom.style.display = "none";
+
+          zoneMap.style.display = "block";
+          loadZoneMap();
+        } else if (sectionId === "scheduleSection") {
+          top.style.display = "none";
+          stats.style.display = "none";
+          layout.style.display = "none";
+          bottom.style.display = "none";
+
+          schedule.style.display = "block";
+
+          loadSchedule();
+        } else {
+          top.style.display = "flex";
+          stats.style.display = "grid";
+          layout.style.display = "grid";
+          bottom.style.display = "grid";
+        }
+      }
+      // ================= ZONE MAP =================
+
+      let zoneMap;
+
+      async function loadZoneMap() {
+        if (!zoneMap) {
+          zoneMap = L.map("zoneMap").setView([20.5937, 78.9629], 5);
+
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; OpenStreetMap contributors",
+          }).addTo(zoneMap);
+        }
+
+        zoneMap.invalidateSize();
+
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        try {
+          const response = await fetch("http://localhost:5000/api/zones", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          const zones = await response.json();
+
+          console.log("MAP ZONES:", zones);
+
+          if (!response.ok) {
+            throw new Error(zones.message || "Could not load zones");
+          }
+
+          const locations = [];
+
+          zones.forEach((zone) => {
+            const lat = Number(zone.latitude);
+            const lng = Number(zone.longitude);
+
+            console.log("ZONE:", zone.name, "LAT:", lat, "LNG:", lng);
+
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+              console.warn("Invalid location:", zone);
+              return;
+            }
+
+            const status = String(zone.status || "Good").toLowerCase();
+
+            let markerClass = "default";
+
+            if (status === "good") {
+              markerClass = "good";
+            } else if (status === "low") {
+              markerClass = "low";
+            } else if (status === "critical") {
+              markerClass = "critical";
+            }
+
+            const markerIcon = L.divIcon({
+              className: "",
+              html: `<div class="zone-marker ${markerClass}"></div>`,
+              iconSize: [18, 18],
+              iconAnchor: [9, 9],
+              popupAnchor: [0, -9],
+            });
+
+            const marker = L.marker([lat, lng], { icon: markerIcon }).addTo(
+              zoneMap,
+            );
+
+            marker.bindPopup(`
+        <b>${zone.name}</b><br>
+        Crop: ${zone.crop}<br>
+        Area: ${zone.area} m²<br>
+        Soil Moisture: ${zone.soilMoisture}%<br>
+        Status: ${zone.status}
+      `);
+
+            locations.push([lat, lng]);
+          });
+
+          if (locations.length > 0) {
+            zoneMap.fitBounds(L.latLngBounds(locations), {
+              padding: [50, 50],
+            });
+          }
+        } catch (error) {
+          console.error("ZONE MAP ERROR:", error);
+        }
+      }
+      async function loadZones() {
+        const token = localStorage.getItem("token");
+        const zoneCards = document.getElementById("zoneCards");
+
+        if (!token) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        try {
+          const response = await fetch("http://localhost:5000/api/zones", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          console.log("Zones API status:", response.status);
+
+          const data = await response.json();
+
+          console.log("Zones API response:", data);
+
+          if (!response.ok) {
+            throw new Error(data.message || `API Error: ${response.status}`);
+          }
+
+          if (!Array.isArray(data)) {
+            throw new Error("Zones API did not return an array");
+          }
+
+          if (data.length === 0) {
+            zoneCards.innerHTML = "No irrigation zones added yet.";
+            return;
+          }
+
+          zoneCards.innerHTML = data
+            .map(
+              (zone) => `
+                  <article class="zone">
+                    <div class="zone-top">
+                      ${zone.name}
+                      <span class="pill">${zone.status}</span>
+                    </div>
+
+                    <small>${zone.crop} • ${zone.area} m²</small>
+
+                    <div class="zone-data">
+                      <div class="ring">${zone.soilMoisture}%</div>
+
+                      <div class="details">
+                        Crop <b>${zone.crop}</b><br>
+                        Next water <b>${zone.nextWater}</b><br>
+                        Status <b>${zone.status}</b>
+                      </div>
+                    </div>
+                  </article>
+                `,
+            )
+            .join("");
+        } catch (error) {
+          console.error("Zones loading error:", error);
+
+          zoneCards.innerHTML = `
+                  <div style="color:#ff7777; padding:15px;">
+                    Unable to load irrigation zones.
+                    <br>
+                    <small>${error.message}</small>
+                  </div>
+                `;
+        }
+      }
+      async function loadSchedule() {
+        const token = localStorage.getItem("token");
+        const scheduleGrid = document.getElementById("scheduleGrid");
+
+        if (!token) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        try {
+          const response = await fetch("http://localhost:5000/api/zones", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          const zones = await response.json();
+
+          if (!response.ok) {
+            throw new Error(zones.message || "Failed to load schedules");
+          }
+
+          if (zones.length === 0) {
+            scheduleGrid.innerHTML = `
+        <p>No zones added yet.</p>
+      `;
+            return;
+          }
+
+          scheduleGrid.innerHTML = zones
+            .map(
+              (zone) => `
+      <div class="schedule-card">
+        <div class="schedule-info">
+          <h2>🌱 ${zone.name}</h2>
+          <p>Crop: ${zone.crop}</p>
+          <p>
+            Next Water:
+            <b>${zone.nextWater || "Not scheduled"}</b>
+          </p>
+          <p>
+            Schedule:
+            <b>${zone.aiSchedule || "Daily"}</b>
+          </p>
+        </div>
+
+        <span class="schedule-status ${
+          zone.isActive ? "running" : "scheduled"
+        }">
+          ${zone.isActive ? "Running" : "Scheduled"}
+        </span>
+      </div>
+    `,
+            )
+            .join("");
+        } catch (error) {
+          console.error("Schedule error:", error);
+
+          scheduleGrid.innerHTML = `
+      <p>Unable to load schedules.</p>
+    `;
+        }
+      }
+      async function loadWaterAndActivity() {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        try {
+          const response = await fetch("http://localhost:5000/api/zones", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          const zones = await response.json();
+
+          if (!response.ok) {
+            throw new Error(zones.message || "Unable to load zone data");
+          }
+
+          /* ================= WATER USAGE ================= */
+
+          const usageContainer = document.getElementById("waterUsageBars");
+
+          if (zones.length === 0) {
+            usageContainer.innerHTML = `
+        <div style="padding:20px;">
+          No irrigation zones added yet.
+        </div>
+      `;
+          } else {
+            const maxUsage = Math.max(
+              ...zones.map((zone) => Number(zone.waterUsed || 0)),
+              1,
+            );
+
+            usageContainer.innerHTML = zones
+              .map((zone) => {
+                const used = Number(zone.waterUsed || 0);
+
+                const height = Math.max(8, (used / maxUsage) * 120);
+
+                return `
+          <div class="bar-item">
+
+            <i
+              style="height:${height}px"
+              title="${used} L"
+            ></i>
+
+            ${zone.name}
+
+            <small>
+              ${used} L
+            </small>
+
+          </div>
+        `;
+              })
+              .join("");
+          }
+
+          /* ================= RECENT ACTIVITY ================= */
+
+          const activityContainer = document.getElementById("recentActivity");
+
+          if (zones.length === 0) {
+            activityContainer.innerHTML = `
+        <div class="event">
+          No activity yet.
+        </div>
+      `;
+          } else {
+            activityContainer.innerHTML = zones
+              .slice(0, 5)
+              .map((zone) => {
+                const used = Number(zone.waterUsed || 0);
+
+                const saved = Number(zone.waterSaved || 0);
+
+                let message;
+
+                if (zone.isActive) {
+                  message = `${zone.name} — Irrigation running`;
+                } else if (used > 0) {
+                  message = `${zone.name} — ${used} L delivered`;
+                } else {
+                  message = `${zone.name} — Zone added`;
+                }
+
+                return `
+            <div class="event">
+
+              ${message}
+
+              <small>
+                ${saved > 0 ? `${saved} L saved` : "No irrigation data yet"}
+              </small>
+
+            </div>
+          `;
+              })
+              .join("");
+          }
+        } catch (error) {
+          console.error("Water/Activity error:", error);
+
+          document.getElementById("waterUsageBars").innerHTML = `
+      <div style="color:#ff7777;padding:20px;">
+        Unable to load water usage.
+      </div>
+    `;
+
+          document.getElementById("recentActivity").innerHTML = `
+      <div class="event">
+        Unable to load activity.
+      </div>
+    `;
+        }
+      }
+
+      loadZones();
+      loadSchedule();
+      loadDashboard();
+      loadWeather();
+      loadRecommendations();
+      loadWaterAndActivity();
+
+      setInterval(loadDashboard, 5000);
+      setInterval(loadWeather, 10 * 60 * 1000);
+    </script>
+  </body>
+</html>

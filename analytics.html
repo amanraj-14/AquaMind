@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>AquaMind - Analytics</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background: #031810;
+        color: white;
+        min-height: 100vh;
+      }
+
+      .container {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* SIDEBAR */
+      .sidebar {
+        width: 240px;
+        background: #041b11;
+        border-right: 1px solid #174a34;
+        padding: 20px 16px;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+      }
+
+      .logo {
+        padding: 0 10px 25px;
+        border-bottom: 1px solid #174a34;
+        margin-bottom: 15px;
+      }
+
+      .logo h2 {
+        color: #ffffff;
+        font-size: 21px;
+      }
+
+      .logo span {
+        color: #35e58b;
+        font-size: 10px;
+        letter-spacing: 2px;
+      }
+
+      .nav a {
+        display: block;
+        padding: 13px 12px;
+        margin: 5px 0;
+        border-radius: 10px;
+        color: #75bd9a;
+        text-decoration: none;
+        font-size: 15px;
+      }
+
+      .nav a:hover,
+      .nav a.active {
+        background: #0c4027;
+        color: #3ee58b;
+      }
+
+      .system {
+        position: absolute;
+        bottom: 25px;
+        left: 16px;
+        right: 16px;
+        border-top: 1px solid #174a34;
+        padding-top: 20px;
+        color: #75bd9a;
+        font-size: 13px;
+        line-height: 1.8;
+      }
+
+      .system b {
+        color: #35e58b;
+        float: right;
+      }
+
+      /* MAIN */
+      .main {
+        margin-left: 240px;
+        width: calc(100% - 240px);
+        padding: 25px;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+
+      .topbar h1 {
+        font-size: 30px;
+      }
+
+      .topbar p {
+        color: #54a77d;
+        margin-top: 7px;
+      }
+
+      .back-btn {
+        background: #3ee58b;
+        color: #032015;
+        padding: 13px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      /* STAT CARDS */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+
+      .card {
+        background: #061f13;
+        border: 1px solid #174a34;
+        border-radius: 15px;
+        padding: 22px;
+      }
+
+      .card h3 {
+        color: #54b884;
+        font-size: 13px;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .card h2 {
+        font-size: 30px;
+        color: white;
+      }
+
+      .card p {
+        color: #38df87;
+        margin-top: 8px;
+        font-size: 13px;
+      }
+
+      /* ZONE ANALYTICS */
+      .section-title {
+        font-size: 21px;
+        margin-bottom: 15px;
+      }
+
+      .zones {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+
+      .zone-card {
+        background: #061f13;
+        border: 1px solid #174a34;
+        border-radius: 15px;
+        padding: 22px;
+      }
+
+      .zone-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+      }
+
+      .zone-header h2 {
+        font-size: 19px;
+      }
+
+      .crop {
+        color: #54b884;
+        font-size: 13px;
+        margin-top: 5px;
+      }
+
+      .moisture {
+        font-size: 25px;
+        color: #3ee58b;
+        font-weight: bold;
+      }
+
+      .bar {
+        height: 9px;
+        background: #173c2b;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 12px;
+      }
+
+      .bar-fill {
+        height: 100%;
+        background: #35e58b;
+        border-radius: 10px;
+      }
+
+      .zone-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .detail {
+        background: #08291a;
+        padding: 12px;
+        border-radius: 8px;
+      }
+
+      .detail span {
+        display: block;
+        color: #63a985;
+        font-size: 12px;
+        margin-bottom: 5px;
+      }
+
+      .detail b {
+        color: white;
+      }
+
+      .empty {
+        background: #061f13;
+        border: 1px solid #174a34;
+        padding: 50px;
+        text-align: center;
+        border-radius: 15px;
+        color: #70a98d;
+      }
+
+      @media (max-width: 1000px) {
+        .stats {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .zones {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 650px) {
+        .sidebar {
+          width: 190px;
+        }
+
+        .main {
+          margin-left: 190px;
+          width: calc(100% - 190px);
+        }
+
+        .stats {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="logo">
+          <h2>🌱 AquaMind</h2>
+          <span>AI IRRIGATION</span>
+        </div>
+
+        <nav class="nav">
+          <a href="dashboard.html"> ▦ &nbsp; Overview </a>
+
+          <a href="dashboard.html"> ♧ &nbsp; Zone Map </a>
+
+          <a href="dashboard.html"> ▣ &nbsp; Schedule </a>
+
+          <a href="analytics.html" class="active"> ⌁ &nbsp; Analytics </a>
+
+          <a href="weather.html"> ☂ &nbsp; Weather </a>
+
+          <a href="index.html"> ⚙ &nbsp; Home </a>
+        </nav>
+
+        <div class="system">
+          SYSTEM<br />
+
+          Sensors
+          <b id="sensorStatus">--</b>
+
+          <br />
+
+          Network
+          <b>Connected</b>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="main">
+        <div class="topbar">
+          <div>
+            <h1>Farm Analytics</h1>
+            <p>Real-time irrigation performance</p>
+          </div>
+
+          <a href="dashboard.html" class="back-btn"> ← Dashboard </a>
+        </div>
+
+        <!-- STATISTICS -->
+        <div class="stats">
+          <div class="card">
+            <h3>Total Zones</h3>
+            <h2 id="totalZones">0</h2>
+            <p>Active irrigation zones</p>
+          </div>
+
+          <div class="card">
+            <h3>Average Soil Moisture</h3>
+            <h2 id="avgMoisture">0%</h2>
+            <p>Across all zones</p>
+          </div>
+
+          <div class="card">
+            <h3>Water Used</h3>
+            <h2 id="waterUsed">0 L</h2>
+            <p>Total irrigation usage</p>
+          </div>
+
+          <div class="card">
+            <h3>Water Saved</h3>
+            <h2 id="waterSaved">0 L</h2>
+            <p>AI optimized savings</p>
+          </div>
+        </div>
+
+        <!-- ZONE ANALYTICS -->
+
+        <h2 class="section-title">Zone-wise Analytics</h2>
+
+        <div id="zonesContainer" class="zones">
+          <div class="empty">Loading analytics...</div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      async function loadAnalytics() {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        try {
+          const response = await fetch("http://localhost:5000/api/zones", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          const zones = await response.json();
+
+          if (!response.ok) {
+            throw new Error(zones.message || "Failed to load analytics");
+          }
+
+          /* TOTAL ZONES */
+
+          document.getElementById("totalZones").textContent = zones.length;
+
+          /* AVERAGE MOISTURE */
+
+          if (zones.length > 0) {
+            const totalMoisture = zones.reduce(
+              (sum, zone) => sum + Number(zone.soilMoisture || 0),
+              0,
+            );
+
+            const average = totalMoisture / zones.length;
+
+            document.getElementById("avgMoisture").textContent =
+              average.toFixed(1) + "%";
+          } else {
+            document.getElementById("avgMoisture").textContent = "0%";
+          }
+
+          /* WATER USED */
+
+          const totalWaterUsed = zones.reduce(
+            (sum, zone) => sum + Number(zone.waterUsed || 0),
+            0,
+          );
+
+          document.getElementById("waterUsed").textContent =
+            totalWaterUsed + " L";
+
+          /* WATER SAVED */
+
+          const totalWaterSaved = zones.reduce(
+            (sum, zone) => sum + Number(zone.waterSaved || 0),
+            0,
+          );
+
+          document.getElementById("waterSaved").textContent =
+            totalWaterSaved + " L";
+
+          /* SENSOR STATUS */
+
+          document.getElementById("sensorStatus").textContent =
+            zones.length > 0 ? zones.length + " zones" : "No zones";
+
+          /* ZONE CARDS */
+
+          const container = document.getElementById("zonesContainer");
+
+          if (zones.length === 0) {
+            container.innerHTML = `
+        <div class="empty">
+          <h2>No zones added yet</h2>
+          <p>
+            Add a zone from Dashboard to see analytics.
+          </p>
+        </div>
+      `;
+
+            return;
+          }
+
+          container.innerHTML = zones
+            .map((zone) => {
+              const moisture = Number(zone.soilMoisture || 0);
+
+              return `
+
+        <div class="zone-card">
+
+          <div class="zone-header">
+
+            <div>
+
+              <h2>
+                🌱 ${zone.name}
+              </h2>
+
+              <div class="crop">
+                Crop: ${zone.crop || "Not specified"}
+              </div>
+
+            </div>
+
+            <div class="moisture">
+              ${moisture}%
+            </div>
+
+          </div>
+
+
+          <div class="bar">
+
+            <div
+              class="bar-fill"
+              style="width:${Math.min(moisture, 100)}%"
+            ></div>
+
+          </div>
+
+
+          <div class="zone-details">
+
+            <div class="detail">
+              <span>Area</span>
+              <b>${zone.area || 0} m²</b>
+            </div>
+
+            <div class="detail">
+              <span>Next Water</span>
+              <b>${zone.nextWater || "Not scheduled"}</b>
+            </div>
+
+            <div class="detail">
+              <span>Water Used</span>
+              <b>${zone.waterUsed || 0} L</b>
+            </div>
+
+            <div class="detail">
+              <span>Water Saved</span>
+              <b>${zone.waterSaved || 0} L</b>
+            </div>
+
+          </div>
+
+        </div>
+
+      `;
+            })
+            .join("");
+        } catch (error) {
+          console.error("Analytics error:", error);
+
+          document.getElementById("zonesContainer").innerHTML = `
+      <div class="empty">
+        <h2>Unable to load analytics</h2>
+        <p>${error.message}</p>
+      </div>
+    `;
+        }
+      }
+
+      /* LOAD DATA */
+
+      loadAnalytics();
+    </script>
+  </body>
+</html>

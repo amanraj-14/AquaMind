@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Zone | AquaMind</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        color: white;
+        background: #06120b;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 520px;
+        padding: 32px;
+        border: 1px solid #1d5732;
+        border-radius: 16px;
+        background: #091b10;
+      }
+
+      h1 {
+        margin-top: 0;
+        color: #49e894;
+      }
+
+      p {
+        color: #81ab8d;
+      }
+
+      label {
+        display: block;
+        margin: 18px 0 7px;
+        color: #c9f6d5;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 13px;
+        border: 1px solid #285d39;
+        border-radius: 8px;
+        outline: none;
+        color: white;
+        background: #06120b;
+      }
+
+      button {
+        width: 100%;
+        margin-top: 26px;
+        padding: 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #042012;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        background: #49e894;
+      }
+
+      a {
+        display: block;
+        margin-top: 18px;
+        color: #49e894;
+        text-align: center;
+      }
+
+      #message {
+        min-height: 20px;
+        margin-top: 14px;
+        text-align: center;
+        color: #ffcf5a;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <style>
+      #zonePickerMap {
+        width: 100%;
+        height: 350px;
+        margin-top: 10px;
+        border-radius: 10px;
+        border: 1px solid #285d39;
+        overflow: hidden;
+      }
+
+      .location-text {
+        margin-top: 8px;
+        color: #81ab8d;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main class="card">
+      <h1>Add Irrigation Zone</h1>
+      <p>Enter your farm-zone information.</p>
+
+      <form id="zoneForm">
+        <label for="name">Zone Name</label>
+        <input
+          id="name"
+          type="text"
+          placeholder="Example: Front Lawn"
+          required
+        />
+
+        <label for="crop">Crop</label>
+        <input id="crop" type="text" placeholder="Example: Wheat" required />
+
+        <label for="area">Area (m²)</label>
+        <input id="area" type="number" placeholder="Example: 320" required />
+
+        <label for="soilMoisture">Soil Moisture (%)</label>
+        <input
+          id="soilMoisture"
+          type="number"
+          min="0"
+          max="100"
+          placeholder="Example: 45"
+        />
+
+        <label for="status">Status</label>
+        <select id="status">
+          <option>Good</option>
+          <option>Low</option>
+          <option>Critical</option>
+        </select>
+
+        <label for="nextWater">Next Water Time</label>
+        <input id="nextWater" type="text" placeholder="Example: 6:00 AM" />
+        <label>Select Zone Location</label>
+
+        <div id="zonePickerMap"></div>
+
+        <p class="location-text" id="locationText">
+          Click on the map to select your zone location.
+        </p>
+
+        <input type="hidden" id="latitude" />
+        <input type="hidden" id="longitude" />
+        <button type="submit">Add Zone</button>
+        <p id="message"></p>
+      </form>
+
+      <a href="dashboard.html">← Back to Dashboard</a>
+    </main>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      const token = localStorage.getItem("token");
+      // ================= ZONE LOCATION MAP =================
+
+      let pickerMap;
+      let locationMarker;
+
+      pickerMap = L.map("zonePickerMap").setView([28.6139, 77.209], 12);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(pickerMap);
+
+      pickerMap.on("click", function (event) {
+        const latitude = event.latlng.lat.toFixed(6);
+        const longitude = event.latlng.lng.toFixed(6);
+
+        if (locationMarker) {
+          locationMarker.setLatLng(event.latlng);
+        } else {
+          locationMarker = L.marker(event.latlng).addTo(pickerMap);
+        }
+
+        document.getElementById("latitude").value = latitude;
+        document.getElementById("longitude").value = longitude;
+
+        document.getElementById("locationText").textContent =
+          `Selected Location: ${latitude}, ${longitude}`;
+      });
+
+      if (!token) {
+        window.location.href = "login.html";
+      }
+
+      document
+        .getElementById("zoneForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const message = document.getElementById("message");
+
+          const zoneData = {
+            name: document.getElementById("name").value,
+            crop: document.getElementById("crop").value,
+            area: Number(document.getElementById("area").value),
+            soilMoisture: Number(
+              document.getElementById("soilMoisture").value || 0,
+            ),
+            status: document.getElementById("status").value,
+            nextWater:
+              document.getElementById("nextWater").value || "Not scheduled",
+            latitude: Number(document.getElementById("latitude").value),
+            longitude: Number(document.getElementById("longitude").value),
+          };
+
+          try {
+            const response = await fetch("http://localhost:5000/api/zones", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(zoneData),
+            });
+
+            const data = await response.json();
+            message.textContent = data.message;
+
+            if (response.ok) {
+              setTimeout(() => {
+                window.location.href = "dashboard.html";
+              }, 1000);
+            }
+          } catch (error) {
+            message.textContent = "Server is not running.";
+          }
+        });
+    </script>
+  </body>
+</html>

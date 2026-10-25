@@ -1,0 +1,142 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #071f1b;
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px 8%;
+  background:
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(24, 120, 91, 0.35),
+      transparent 35%
+    ),
+    linear-gradient(135deg, #071f1b, #0b3028);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.logo-icon {
+  color: #50d6a0;
+  font-size: 30px;
+}
+
+.hero-content {
+  max-width: 850px;
+  margin: auto 0;
+}
+
+.hero-content h1 {
+  font-size: clamp(42px, 6vw, 78px);
+  line-height: 1.05;
+  margin-bottom: 25px;
+}
+
+.hero-content h1 span {
+  display: block;
+  color: #50d6a0;
+}
+
+.hero-content p {
+  font-size: 20px;
+  color: #b8cbc6;
+  max-width: 650px;
+  line-height: 1.6;
+  margin-bottom: 35px;
+}
+
+.buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.btn {
+  padding: 15px 30px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.primary {
+  background: #50d6a0;
+  color: #062019;
+  border: none;
+}
+
+.secondary {
+  background: transparent;
+  color: white;
+  border: 1px solid #78918b;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.stats {
+  display: flex;
+  gap: 70px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 25px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat strong {
+  font-size: 22px;
+  color: #50d6a0;
+}
+
+.stat span {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: #9db2ac;
+}
+
+@media (max-width: 700px) {
+  .hero {
+    padding: 30px 25px;
+  }
+
+  .hero-content h1 {
+    font-size: 42px;
+  }
+
+  .hero-content p {
+    font-size: 17px;
+  }
+
+  .buttons {
+    flex-direction: column;
+    max-width: 250px;
+  }
+
+  .stats {
+    gap: 25px;
+    flex-wrap: wrap;
+  }
+}
